@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Parking Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #444;
+        }
+
+        .menu {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 10px;
+            border: none;
+            background-color: #5cb85c;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Parking Management System</h1>
+
+        <div class="menu">
+            <button onclick="showSection('parkVehicle')">Park Vehicle</button>
+            <button onclick="showSection('removeVehicle')">Remove Vehicle</button>
+            <button onclick="displayStatus()">Display Parking Lot Status</button>
+            <button onclick="showSection('searchVehicle')">Search Vehicle</button>
+            <button onclick="showSection('displayByType')">Display Vehicles by Type</button>
+            <button onclick="showSection('calculateFee')">Calculate Fee</button>
+        </div>
+
+        <div id="output" class="output"></div>
+
+        <!-- Park Vehicle -->
+        <div id="parkVehicle" class="section hidden">
+            <h2>Park Vehicle</h2>
+            <input type="text" id="vehicleNumber" placeholder="Vehicle Number">
+            <select id="vehicleType">
+                <option value="Car">Car</option>
+                <option value="Bike">Bike</option>
+                <option value="Truck">Truck</option>
+            </select>
+            <button onclick="parkVehicle()">Submit</button>
+        </div>
+
+        <!-- Remove Vehicle -->
+        <div id="removeVehicle" class="section hidden">
+            <h2>Remove Vehicle</h2>
+            <input type="text" id="removeVehicleNumber" placeholder="Vehicle Number">
+            <button onclick="removeVehicle()">Submit</button>
+        </div>
+
+        <!-- Search Vehicle -->
+        <div id="searchVehicle" class="section hidden">
+            <h2>Search Vehicle</h2>
+            <input type="text" id="searchVehicleNumber" placeholder="Vehicle Number">
+            <button onclick="searchVehicle()">Submit</button>
+        </div>
+
+        <!-- Display By Type -->
+        <div id="displayByType" class="section hidden">
+            <h2>Display Vehicles by Type</h2>
+            <select id="displayType">
+                <option value="Car">Car</option>
+                <option value="Bike">Bike</option>
+                <option value="Truck">Truck</option>
+            </select>
+            <button onclick="displayByType()">Submit</button>
+        </div>
+
+        <!-- Calculate Fee -->
+        <div id="calculateFee" class="section hidden">
+            <h2>Calculate Fee</h2>
+            <select id="feeType">
+                <option value="Car">Car</option>
+                <option value="Bike">Bike</option>
+                <option value="Truck">Truck</option>
+            </select>
+            <input type="number" id="parkingHours" placeholder="Parking Hours">
+         <button onclick="calculateFee()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        let parkingLot = []; // Simulate a parking lot array with objects
+        const capacity = 5; // Set maximum parking capacity
+
+        const showSection = (sectionId) => {
+            document.querySelectorAll('.section').forEach((section) => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        };
+
+        const parkVehicle = () => {
+            const vehicleNumber = document.getElementById("vehicleNumber").value.trim();
+            const vehicleType = document.getElementById("vehicleType").value;
+
+            if (!vehicleNumber) {
+                alert("Please enter a valid vehicle number.");
+                return;
+            }
+
+            if (parkingLot.length >= capacity) {
+                alert("Parking lot is full.");
+                return;
+            }
+
+            parkingLot.push({ vehicleNumber, vehicleType });
+            alert("Vehicle parked successfully.");
+            displayStatus();
+        };
+
+        const removeVehicle = () => {
+            const vehicleNumber = document.getElementById("removeVehicleNumber").value.trim();
+
+            const index = parkingLot.findIndex((v) => v.vehicleNumber === vehicleNumber);
+            if (index === -1) {
+                alert("Vehicle not found.");
+                return;
+            }
+
+            parkingLot.splice(index, 1);
+            alert("Vehicle removed successfully.");
+            displayStatus();
+        };
+
+        const displayStatus = () => {
+            const output = document.getElementById("output");
+            output.innerHTML = "<h3>Parking Lot Status:</h3>";
+
+            if (parkingLot.length === 0) {
+                output.innerHTML += "<p>No vehicles are currently parked.</p>";
+            } else {
+                parkingLot.forEach((vehicle, index) => {
+                    output.innerHTML += `<p>${index + 1}. ${vehicle.vehicleNumber} (${vehicle.vehicleType})</p>`;
+                });
+            }
+        };
+
+        const searchVehicle = () => {
+            const vehicleNumber = document.getElementById("searchVehicleNumber").value.trim();
+
+            const vehicle = parkingLot.find((v) => v.vehicleNumber === vehicleNumber);
+            const output = document.getElementById("output");
+
+            if (!vehicle) {
+                output.innerHTML = `<p>Vehicle with number "${vehicleNumber}" not found.</p>`;
+            } else {
+                output.innerHTML = `<p>Vehicle Found: ${vehicle.vehicleNumber} (${vehicle.vehicleType})</p>`;
+            }
+        };
+
+        const displayByType = () => {
+            const type = document.getElementById("displayType").value;
+            const output = document.getElementById("output");
+
+            const vehiclesByType = parkingLot.filter((v) => v.vehicleType === type);
+            output.innerHTML = `<h3>Vehicles of Type: ${type}</h3>`;
+
+            if (vehiclesByType.length === 0) {
+                output.innerHTML += "<p>No vehicles of this type are parked.</p>";
+            } else {
+                vehiclesByType.forEach((vehicle, index) => {
+                    output.innerHTML += `<p>${index + 1}. ${vehicle.vehicleNumber}</p>`;
+                });
+            }
+        };
+
+        const calculateFee = () => {
+            const type = document.getElementById("feeType").value;
+            const hours = parseInt(document.getElementById("parkingHours").value);
+
+            const fees = { Car: 2, Bike: 1, Truck: 3 };
+            const fee = fees[type] * hours;
+
+            const output = document.getElementById("output");
+            output.innerHTML = `<p>Parking Fee for a ${type} for ${hours} hours is $${fee.toFixed(2)}</p>`;
+        };
+    </script>
+</body>
+</html>
